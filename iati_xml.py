@@ -64,8 +64,9 @@ def download():
                         del activities
                 except:
                     pass
-            with open(os.path.join(data_dir, f"{publisher_id}.json"), "w") as out_file:
-                json.dump(publisher_data, out_file)
+            if len(publisher_data) > 0:
+                with open(os.path.join(data_dir, f"{publisher_id}.json"), "w") as out_file:
+                    json.dump(publisher_data, out_file)
     else:
         print(f"{data_dir} already exists, skipping unpacking...")
 
