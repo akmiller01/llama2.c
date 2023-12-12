@@ -28,7 +28,7 @@ def download():
     """Downloads the dataset to DATA_CACHE_DIR"""
     os.makedirs(DATA_CACHE_DIR, exist_ok=True)
 
-    data_path = "/home/alex/git/IATI-Registry-Refresher/data"
+    data_path = "/content/iati-data-main/data"
     publisher_directories = [f.path for f in os.scandir(data_path) if f.is_dir()]
 
     # unpack the tar.gz file into all the data shards (json files)
