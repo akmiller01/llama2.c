@@ -64,7 +64,7 @@ def download():
                         del activities
                 except:
                     pass
-            if len(publisher_data) > 0:
+            if len(publisher_data) > 10:
                 with open(os.path.join(data_dir, f"{publisher_id}.json"), "w") as out_file:
                     json.dump(publisher_data, out_file)
     else:
