@@ -37,7 +37,7 @@ def download():
         os.makedirs(data_dir, exist_ok=True)
         print("Copying IATI data...")
         shard_index = 0
-        shard_size = 100
+        shard_size = 5000
         iati_data = []
         for publisher_directory in publisher_directories:
             publisher_id = os.path.basename(publisher_directory)
