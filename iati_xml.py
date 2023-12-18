@@ -36,8 +36,10 @@ def download():
     if not os.path.exists(data_dir):
         os.makedirs(data_dir, exist_ok=True)
         print("Copying IATI data...")
+        shard_index = 0
+        shard_size = 100
+        iati_data = []
         for publisher_directory in publisher_directories:
-            publisher_data = []
             publisher_id = os.path.basename(publisher_directory)
             xml_files = glob.glob(os.path.join(publisher_directory, "*"))
             for xml_file in xml_files:
@@ -52,7 +54,12 @@ def download():
                                 activity_xml = etree.tostring(activity, encoding='utf-8').decode()
                                 xml_json['identifier'] = identifier
                                 xml_json['story'] = activity_xml
-                                publisher_data.append(xml_json)
+                                iati_data.append(xml_json)
+                                if len(iati_data) >= shard_size:
+                                    shard_index += 1
+                                    with open(os.path.join(data_dir, f"{shard_index}.json"), "w") as out_file:
+                                        json.dump(iati_data, out_file)
+                                    iati_data = []
                             # Free memory
                             activity.clear()
                             for ancestor in activity.xpath('ancestor-or-self::*'):
@@ -64,9 +71,10 @@ def download():
                         del activities
                 except:
                     pass
-            if len(publisher_data) > 10:
-                with open(os.path.join(data_dir, f"{publisher_id}.json"), "w") as out_file:
-                    json.dump(publisher_data, out_file)
+        if len(iati_data) > 0:
+            shard_index += 1
+            with open(os.path.join(data_dir, f"{shard_index}.json"), "w") as out_file:
+                json.dump(iati_data, out_file)
     else:
         print(f"{data_dir} already exists, skipping unpacking...")
 
@@ -177,7 +185,7 @@ def pretokenize(vocab_size):
 
     # process all the shards in a process pool
     fun = partial(process_shard, vocab_size=vocab_size)
-    with ProcessPoolExecutor(max_workers=1) as executor:
+    with ProcessPoolExecutor(max_workers=4) as executor:
         executor.map(fun, enumerate(shard_filenames))
     print("Done.")
 
